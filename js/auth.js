@@ -13,8 +13,8 @@ const Auth = {
     const hex = Array.from(new Uint8Array(hashBuf))
       .map(b => b.toString(16).padStart(2, '0')).join('');
     return {
-      email: `q-${hex.slice(0, 20)}@agradi.app`,
-      password: `Q!${hex.slice(20, 52)}`,
+      email: `quick.${hex.slice(0, 20)}@gmail.com`,
+      password: `Q!a${hex.slice(20, 52)}`,
     };
   },
 
@@ -125,9 +125,12 @@ const Auth = {
   translateError(msg) {
     const m = (msg || '').toLowerCase();
     if (m.includes('invalid login') || m.includes('invalid credentials')) return 'الإيميل أو كلمة السر غير صحيحة';
-    if (m.includes('already registered') || m.includes('already exists')) return 'هذا الإيميل مسجل مسبقاً';
+    if (m.includes('already registered') || m.includes('already exists') || m.includes('user already')) return 'هذا الحساب مسجل مسبقاً';
     if (m.includes('password') && m.includes('6')) return 'كلمة السر يجب أن تكون 6 أحرف على الأقل';
-    if (m.includes('email')) return 'الإيميل غير صحيح';
+    if (m.includes('email address') && m.includes('invalid')) return 'صيغة الإيميل غير مقبولة من Supabase — راجع Console';
+    if (m.includes('signup') && m.includes('disabled')) return 'التسجيل معطّل في Supabase — فعّله من Authentication';
+    if (m.includes('rate limit')) return 'حاول بعد دقيقة (rate limit)';
+    if (m.includes('email')) return 'مشكلة في الإيميل: ' + (msg || '');
     return msg || 'حدث خطأ، حاول مرة أخرى';
   },
 

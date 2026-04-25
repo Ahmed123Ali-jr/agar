@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>توليد أيقونات PWA</title>
+  <style>
+    body { font-family: sans-serif; padding: 2rem; text-align: center; background: #faf7f2; }
+    canvas { border: 1px solid #ccc; margin: 1rem; }
+    button { padding: 12px 20px; background: #c8553d; color: white; border: none; border-radius: 8px; font-size: 1rem; cursor: pointer; margin: 4px; }
+  </style>
+</head>
+<body>
+  <h2>توليد أيقونات PNG لتطبيق أغراضي</h2>
+  <p>افتح هذه الصفحة في المتصفح، ثم اضغط الأزرار لتنزيل الأيقونات.</p>
+
+  <div>
+    <canvas id="c192" width="192" height="192"></canvas>
+    <canvas id="c512" width="512" height="512"></canvas>
+  </div>
+
+  <div>
+    <button onclick="download(192)">تنزيل icon-192.png</button>
+    <button onclick="download(512)">تنزيل icon-512.png</button>
+  </div>
+
+  <script>
+    function draw(size) {
+      const c = document.getElementById('c' + size);
+      const ctx = c.getContext('2d');
+      const r = size * 0.18;
+      // خلفية
+      ctx.fillStyle = '#c8553d';
+      const x = 0, y = 0, w = size, h = size;
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + w, y, x + w, y + h, r);
+      ctx.arcTo(x + w, y + h, x, y + h, r);
+      ctx.arcTo(x, y + h, x, y, r);
+      ctx.arcTo(x, y, x + w, y, r);
+      ctx.closePath();
+      ctx.fill();
+      // إيموجي
+      ctx.font = (size * 0.55) + 'px Apple Color Emoji, Segoe UI Emoji, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('📦', size/2, size/2 + size*0.04);
+    }
+    draw(192); draw(512);
+
+    function download(size) {
+      const c = document.getElementById('c' + size);
+      const a = document.createElement('a');
+      a.download = 'icon-' + size + '.png';
+      a.href = c.toDataURL('image/png');
+      a.click();
+    }
+  </script>
+</body>
+</html>

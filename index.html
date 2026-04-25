@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#c8553d" />
+  <title>أغراضي</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@500;600;700&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- شاشة التحميل -->
+  <div id="splash" class="screen active">
+    <div class="splash-inner">
+      <div class="splash-logo">📦</div>
+      <h1>أغراضي</h1>
+      <div class="loader"></div>
+    </div>
+  </div>
+
+  <!-- شاشة تسجيل الدخول -->
+  <div id="auth-screen" class="screen">
+    <div class="auth-container">
+      <div class="auth-logo">📦</div>
+      <h1 class="app-title">أغراضي</h1>
+      <p class="app-subtitle">وين حطيت الشي؟ نحن نتذكر لك</p>
+
+      <div class="tabs">
+        <button class="tab active" data-tab="login">دخول</button>
+        <button class="tab" data-tab="signup">حساب جديد</button>
+        <button class="tab" data-tab="quick">دخول سريع</button>
+      </div>
+
+      <form id="auth-form" class="auth-form">
+        <input type="text" id="signup-name" placeholder="اسمك" autocomplete="name" style="display:none" />
+        <input type="text" id="quick-name" placeholder="اكتب اسمك فقط" autocomplete="name" style="display:none" />
+        <input type="email" id="auth-email" placeholder="الإيميل" autocomplete="email" required />
+        <input type="password" id="auth-password" placeholder="كلمة السر" autocomplete="current-password" required minlength="6" />
+        <p id="quick-hint" class="muted" style="display:none;font-size:.85rem;text-align:center;margin-top:4px">
+          ⚡ بدون إيميل · يُحفظ على هذا الجهاز فقط
+        </p>
+        <button type="submit" class="btn-primary" id="auth-submit">دخول</button>
+        <p id="auth-error" class="error-msg"></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- شاشة اختيار العائلة -->
+  <div id="family-setup-screen" class="screen">
+    <div class="auth-container">
+      <div class="auth-logo">👨‍👩‍👧‍👦</div>
+      <h1 class="app-title">عائلتك</h1>
+      <p class="app-subtitle">أنشئ عائلة جديدة أو انضم لعائلة موجودة</p>
+
+      <div class="family-options">
+        <button class="big-option" id="create-family-btn">
+          <span class="big-emoji">✨</span>
+          <span class="big-label">إنشاء عائلة جديدة</span>
+        </button>
+        <button class="big-option" id="join-family-btn">
+          <span class="big-emoji">🔑</span>
+          <span class="big-label">الانضمام بكود</span>
+        </button>
+      </div>
+
+      <div id="create-family-form" class="hidden">
+        <input type="text" id="new-family-name" placeholder="اسم العائلة (مثال: عائلة العسيري)" />
+        <input type="text" id="creator-display-name" placeholder="اسمك في العائلة" />
+        <button class="btn-primary" id="confirm-create-family">إنشاء</button>
+      </div>
+
+      <div id="join-family-form" class="hidden">
+        <input type="text" id="invite-code-input" placeholder="كود الدعوة (6 أحرف)" maxlength="6" style="text-transform:uppercase" />
+        <input type="text" id="joiner-display-name" placeholder="اسمك في العائلة" />
+        <button class="btn-primary" id="confirm-join-family">انضمام</button>
+      </div>
+
+      <p id="family-error" class="error-msg"></p>
+      <button class="btn-text" id="logout-from-setup">تسجيل خروج</button>
+    </div>
+  </div>
+
+  <!-- التطبيق الرئيسي -->
+  <div id="app" class="screen">
+
+    <!-- الهيدر -->
+    <header class="app-header">
+      <div class="search-bar">
+        <input type="text" id="quick-search" placeholder="ابحث عن أي غرض..." />
+        <button class="mic-btn" id="header-mic" title="بحث صوتي">🎤</button>
+      </div>
+    </header>
+
+    <!-- المحتوى -->
+    <main class="app-main">
+
+      <!-- نتائج البحث السريع -->
+      <section id="quick-search-results" class="hidden"></section>
+
+      <!-- صفحة الرئيسية -->
+      <section id="page-home" class="page active">
+        <div class="page-header">
+          <h2>الأماكن</h2>
+          <span id="locations-count" class="count-badge"></span>
+        </div>
+        <div id="locations-grid" class="locations-grid"></div>
+        <div id="empty-locations" class="empty-state hidden">
+          <div class="empty-emoji">📦</div>
+          <h3>لا توجد أماكن بعد</h3>
+          <p>اضغط زر + لإضافة أول مكان تخزين</p>
+        </div>
+      </section>
+
+      <!-- صفحة البحث -->
+      <section id="page-search" class="page">
+        <div class="page-header">
+          <h2>البحث</h2>
+        </div>
+        <div class="search-big">
+          <input type="text" id="search-input" placeholder="اكتب اسم الغرض..." />
+          <button class="mic-btn-big" id="search-mic" title="بحث صوتي">
+            <span class="mic-icon">🎤</span>
+            <span class="mic-label">اضغط للبحث الصوتي</span>
+          </button>
+        </div>
+        <div id="search-results" class="search-results"></div>
+      </section>
+
+      <!-- صفحة العائلة -->
+      <section id="page-family" class="page">
+        <div class="page-header">
+          <h2>العائلة</h2>
+        </div>
+        <div class="family-info">
+          <div class="info-card">
+            <label>اسم العائلة</label>
+            <h3 id="family-name-display"></h3>
+          </div>
+          <div class="info-card invite-card">
+            <label>كود الدعوة</label>
+            <div class="invite-code-row">
+              <span id="invite-code-display"></span>
+              <button class="btn-icon" id="copy-code-btn" title="نسخ">📋</button>
+              <button class="btn-icon" id="share-code-btn" title="مشاركة">📤</button>
+            </div>
+          </div>
+        </div>
+        <h3 class="section-title">الأعضاء</h3>
+        <div id="members-list" class="members-list"></div>
+        <button class="btn-danger" id="leave-family-btn">مغادرة العائلة</button>
+      </section>
+
+      <!-- صفحة الإعدادات -->
+      <section id="page-settings" class="page">
+        <div class="page-header">
+          <h2>الإعدادات</h2>
+        </div>
+        <div class="settings-list">
+          <div class="setting-item">
+            <label>اسمك في العائلة</label>
+            <div class="setting-edit">
+              <input type="text" id="settings-display-name" />
+              <button class="btn-small" id="save-display-name">حفظ</button>
+            </div>
+          </div>
+          <div class="setting-item">
+            <label>الإيميل</label>
+            <p id="settings-email"></p>
+          </div>
+          <button class="btn-danger" id="logout-btn">تسجيل خروج</button>
+          <p class="version">أغراضي · الإصدار 1.0</p>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- زر الإضافة العائم -->
+    <button id="fab" class="fab">+</button>
+
+    <!-- شريط التنقل السفلي -->
+    <nav class="bottom-nav">
+      <button class="nav-btn active" data-page="home">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-label">الرئيسية</span>
+      </button>
+      <button class="nav-btn" data-page="search">
+        <span class="nav-icon">🔍</span>
+        <span class="nav-label">البحث</span>
+      </button>
+      <button class="nav-btn" data-page="family">
+        <span class="nav-icon">👨‍👩‍👧</span>
+        <span class="nav-label">العائلة</span>
+      </button>
+      <button class="nav-btn" data-page="settings">
+        <span class="nav-icon">⚙️</span>
+        <span class="nav-label">الإعدادات</span>
+      </button>
+    </nav>
+
+  </div>
+
+  <!-- ============ Modals ============ -->
+
+  <!-- خيارات الإضافة -->
+  <div id="add-options-modal" class="modal">
+    <div class="modal-content small">
+      <h3>إضافة جديد</h3>
+      <button class="big-option" id="add-location-option">
+        <span class="big-emoji">📦</span>
+        <span class="big-label">إضافة مكان جديد</span>
+      </button>
+      <button class="big-option" id="add-item-option">
+        <span class="big-emoji">🎒</span>
+        <span class="big-label">إضافة غرض جديد</span>
+      </button>
+      <button class="btn-text" data-close-modal>إلغاء</button>
+    </div>
+  </div>
+
+  <!-- إضافة/تعديل مكان -->
+  <div id="location-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="location-modal-title">إضافة مكان</h3>
+        <button class="btn-close" data-close-modal>✕</button>
+      </div>
+      <form id="location-form">
+        <input type="hidden" id="location-id" />
+        <label>اسم المكان</label>
+        <input type="text" id="location-name" placeholder="مثال: صندوق الشتاء" required />
+        <label>الوصف (اختياري)</label>
+        <input type="text" id="location-description" placeholder="مثال: في المستودع، الرف الثاني" />
+        <label>اختر إيموجي</label>
+        <div class="emoji-picker" id="emoji-picker">
+          <button type="button" class="emoji-btn" data-emoji="📦">📦</button>
+          <button type="button" class="emoji-btn" data-emoji="🗄️">🗄️</button>
+          <button type="button" class="emoji-btn" data-emoji="👕">👕</button>
+          <button type="button" class="emoji-btn" data-emoji="🧰">🧰</button>
+          <button type="button" class="emoji-btn" data-emoji="🍴">🍴</button>
+          <button type="button" class="emoji-btn" data-emoji="💊">💊</button>
+          <button type="button" class="emoji-btn" data-emoji="📚">📚</button>
+          <button type="button" class="emoji-btn" data-emoji="🔧">🔧</button>
+          <button type="button" class="emoji-btn" data-emoji="🎁">🎁</button>
+          <button type="button" class="emoji-btn" data-emoji="👜">👜</button>
+          <button type="button" class="emoji-btn" data-emoji="🧸">🧸</button>
+          <button type="button" class="emoji-btn" data-emoji="⚽">⚽</button>
+        </div>
+        <label>صورة (اختياري)</label>
+        <div class="image-upload">
+          <input type="file" id="location-image" accept="image/*" capture="environment" hidden />
+          <button type="button" class="btn-secondary" id="location-image-btn">📷 إضافة صورة</button>
+          <img id="location-image-preview" class="image-preview hidden" />
+          <button type="button" class="btn-text-danger hidden" id="location-image-remove">حذف الصورة</button>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-text" data-close-modal>إلغاء</button>
+          <button type="submit" class="btn-primary" id="save-location-btn">حفظ</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- إضافة/تعديل غرض -->
+  <div id="item-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="item-modal-title">إضافة غرض</h3>
+        <button class="btn-close" data-close-modal>✕</button>
+      </div>
+      <form id="item-form">
+        <input type="hidden" id="item-id" />
+        <label>المكان</label>
+        <select id="item-location-select" required></select>
+        <label>اسم الغرض</label>
+        <input type="text" id="item-name" placeholder="مثال: جاكيت أسود" required />
+        <label>الكمية</label>
+        <input type="number" id="item-quantity" min="1" value="1" />
+        <label>ملاحظات (اختياري)</label>
+        <textarea id="item-notes" rows="2" placeholder="ملاحظات إضافية"></textarea>
+        <label>صورة (اختياري)</label>
+        <div class="image-upload">
+          <input type="file" id="item-image" accept="image/*" capture="environment" hidden />
+          <button type="button" class="btn-secondary" id="item-image-btn">📷 إضافة صورة</button>
+          <img id="item-image-preview" class="image-preview hidden" />
+          <button type="button" class="btn-text-danger hidden" id="item-image-remove">حذف الصورة</button>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-text" data-close-modal>إلغاء</button>
+          <button type="submit" class="btn-primary" id="save-item-btn">حفظ</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- شاشة المكان -->
+  <div id="location-detail-modal" class="modal">
+    <div class="modal-content full">
+      <div class="modal-header">
+        <button class="btn-close" data-close-modal>← رجوع</button>
+        <div class="detail-actions">
+          <button class="btn-icon" id="edit-location-btn" title="تعديل">✏️</button>
+          <button class="btn-icon" id="delete-location-btn" title="حذف">🗑️</button>
+        </div>
+      </div>
+      <div class="location-detail-body">
+        <div id="location-detail-image" class="location-detail-image"></div>
+        <h2 id="location-detail-name"></h2>
+        <p id="location-detail-description" class="muted"></p>
+        <div class="page-header">
+          <h3>الأغراض <span id="items-count" class="count-badge"></span></h3>
+          <button class="btn-small" id="add-item-here-btn">+ إضافة</button>
+        </div>
+        <div id="location-items-list" class="items-list"></div>
+        <div id="empty-items" class="empty-state hidden">
+          <div class="empty-emoji">🎒</div>
+          <p>لا توجد أغراض بعد</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- صورة الغرض -->
+  <div id="item-detail-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="item-detail-name"></h3>
+        <button class="btn-close" data-close-modal>✕</button>
+      </div>
+      <div class="item-detail-body">
+        <div id="item-detail-image" class="item-detail-image"></div>
+        <p class="muted" id="item-detail-location"></p>
+        <p><strong>الكمية:</strong> <span id="item-detail-quantity"></span></p>
+        <div id="item-detail-notes-wrap" class="hidden">
+          <strong>ملاحظات:</strong>
+          <p id="item-detail-notes"></p>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-text-danger" id="delete-item-btn">حذف</button>
+          <button class="btn-primary" id="edit-item-btn">تعديل</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- التأكيد -->
+  <div id="confirm-modal" class="modal">
+    <div class="modal-content small">
+      <h3 id="confirm-title">تأكيد</h3>
+      <p id="confirm-message"></p>
+      <div class="modal-actions">
+        <button class="btn-text" id="confirm-no">إلغاء</button>
+        <button class="btn-danger" id="confirm-yes">تأكيد</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- مؤشر التسجيل الصوتي -->
+  <div id="voice-overlay" class="voice-overlay">
+    <div class="voice-pulse"></div>
+    <p>جاري الاستماع...</p>
+    <p class="muted" id="voice-transcript"></p>
+    <button class="btn-text" id="voice-cancel">إلغاء</button>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast"></div>
+
+  <!-- ============ Scripts ============ -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/family.js"></script>
+  <script src="js/locations.js"></script>
+  <script src="js/items.js"></script>
+  <script src="js/search.js"></script>
+  <script src="js/realtime.js"></script>
+  <script src="js/app.js"></script>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('service-worker.js').catch(()=>{});
+      });
+    }
+  </script>
+</body>
+</html>

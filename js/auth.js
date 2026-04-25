@@ -5,6 +5,19 @@
 const Auth = {
   mode: 'login',
 
+  // اشتقاق إيميل/كلمة سر ثابتة من الاسم → نفس الاسم = نفس الحساب من أي جهاز
+  async deriveCredentials(name) {
+    const normalized = name.trim().toLowerCase();
+    const data = new TextEncoder().encode('agradi-v1:' + normalized);
+    const hashBuf = await crypto.subtle.digest('SHA-256', data);
+    const hex = Array.from(new Uint8Array(hashBuf))
+      .map(b => b.toString(16).padStart(2, '0')).join('');
+    return {
+      email: `q-${hex.slice(0, 20)}@agradi.app`,
+      password: `Q!${hex.slice(20, 52)}`,
+    };
+  },
+
   init() {
     // Tabs
     $$('.tab').forEach(tab => {
@@ -55,16 +68,33 @@ const Auth = {
     try {
       if (Auth.mode === 'quick') {
         if (!quickName) throw new Error('يرجى إدخال اسمك');
-        const { data, error } = await supabaseClient.auth.signInAnonymously({
-          options: { data: { display_name: quickName } }
-        });
-        if (error) {
-          if ((error.message || '').toLowerCase().includes('anonymous')) {
-            throw new Error('فعّل Anonymous Sign-ins في إعدادات Supabase');
+        if (quickName.length < 3) throw new Error('الاسم قصير جداً (3 أحرف على الأقل)');
+
+        const creds = await Auth.deriveCredentials(quickName);
+
+        // محاولة الدخول أولاً
+        let { error: signInErr } = await supabaseClient.auth.signInWithPassword(creds);
+
+        if (signInErr) {
+          const msg = (signInErr.message || '').toLowerCase();
+          // المستخدم غير موجود → أنشئه
+          if (msg.includes('invalid') || msg.includes('not found') || msg.includes('credentials')) {
+            const { data: signUpData, error: signUpErr } = await supabaseClient.auth.signUp({
+              email: creds.email,
+              password: creds.password,
+              options: { data: { display_name: quickName, quick_login: true } }
+            });
+            if (signUpErr) throw signUpErr;
+            if (!signUpData.session) {
+              // تأكيد الإيميل مفعّل → جرب دخول مباشر
+              const { error: e2 } = await supabaseClient.auth.signInWithPassword(creds);
+              if (e2) throw new Error('فعّل خاصية تعطيل تأكيد الإيميل في Supabase');
+            }
+          } else {
+            throw signInErr;
           }
-          throw error;
         }
-        // حفظ الاسم لاستخدامه في إنشاء/الانضمام للعائلة
+
         try { localStorage.setItem('agradi_quick_name', quickName); } catch {}
       } else if (Auth.mode === 'signup') {
         if (!name) throw new Error('يرجى إدخال اسمك');

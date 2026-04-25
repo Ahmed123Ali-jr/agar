@@ -67,10 +67,17 @@ const App = {
     }
 
     if (!memberships || memberships.length === 0) {
-      // تعبئة الاسم تلقائياً من الدخول السريع أو metadata
       const savedName = (() => {
         try { return localStorage.getItem('agradi_quick_name'); } catch { return null; }
       })() || State.user?.user_metadata?.display_name || '';
+
+      // مستخدمو الدخول السريع → ننشئ عائلة شخصية تلقائياً بدون أسئلة
+      const isQuick = State.user?.user_metadata?.quick_login === true;
+      if (isQuick && savedName) {
+        const ok = await App.autoCreateFamily(savedName);
+        if (ok) return App.loadFamilyAndStart(); // إعادة التحميل
+      }
+
       if (savedName) {
         $('#creator-display-name').value = savedName;
         $('#joiner-display-name').value = savedName;
@@ -97,6 +104,36 @@ const App = {
     Realtime.start();
 
     App.showScreen('app');
+  },
+
+  async autoCreateFamily(displayName) {
+    try {
+      const code = Family.generateCode();
+      const { data: family, error } = await supabaseClient
+        .from('families')
+        .insert({
+          name: `عائلة ${displayName}`,
+          invite_code: code,
+          created_by: State.user.id,
+        })
+        .select()
+        .single();
+      if (error) throw error;
+      const { error: memErr } = await supabaseClient
+        .from('family_members')
+        .insert({
+          family_id: family.id,
+          user_id: State.user.id,
+          display_name: displayName,
+          role: 'admin',
+        });
+      if (memErr) throw memErr;
+      return true;
+    } catch (err) {
+      console.error('autoCreateFamily failed', err);
+      toast('تعذّر إنشاء العائلة تلقائياً', 'error');
+      return false;
+    }
   },
 
   showScreen(id) {

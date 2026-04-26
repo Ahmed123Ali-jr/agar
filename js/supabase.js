@@ -49,7 +49,11 @@ function escapeHtml(s) {
     .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 }
 
-function openModal(id) { $('#' + id).classList.add('active'); }
+function openModal(id) {
+  const m = $('#' + id);
+  document.body.appendChild(m); // ضمان الظهور فوق أي نافذة مفتوحة
+  m.classList.add('active');
+}
 function closeModal(id) {
   if (id) $('#' + id).classList.remove('active');
   else $$('.modal.active').forEach(m => m.classList.remove('active'));

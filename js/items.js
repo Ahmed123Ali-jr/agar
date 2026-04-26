@@ -136,6 +136,7 @@ const Items = {
         toast('تمت الإضافة ✓', 'success');
       }
 
+      Realtime.markLocalChange();
       closeModal('item-modal');
       await Items.load();
       Locations.render();
@@ -190,6 +191,7 @@ const Items = {
     if (!ok) return;
     const { error } = await supabaseClient.from('items').delete().eq('id', it.id);
     if (error) { toast('فشل الحذف', 'error'); return; }
+    Realtime.markLocalChange();
     toast('تم الحذف', 'success');
     closeModal('item-detail-modal');
     await Items.load();

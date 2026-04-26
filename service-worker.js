@@ -1,5 +1,5 @@
-// Service Worker بسيط لتطبيق أغراضي
-const CACHE_NAME = 'agradi-v3';
+// Service Worker — Cache-first للسرعة، تحديث في الخلفية
+const CACHE_NAME = 'agradi-v4';
 const ASSETS = [
   './',
   './index.html',
@@ -13,8 +13,7 @@ const ASSETS = [
   './js/realtime.js',
   './js/app.js',
   './manifest.json',
-  './icons/icon-192.png',
-  './icons/icon-512.png',
+  './icons/icon.svg',
 ];
 
 self.addEventListener('install', (e) => {
@@ -36,19 +35,22 @@ self.addEventListener('activate', (e) => {
 self.addEventListener('fetch', (e) => {
   const url = new URL(e.request.url);
 
-  // استثناء طلبات Supabase والـ APIs
+  // استثناء أي طلبات API/Supabase
   if (url.origin !== location.origin) return;
-
-  // Network first للـ HTML/JS، Cache fallback
   if (e.request.method !== 'GET') return;
 
+  // Cache-first: نخدم من الكاش فوراً ونحدّث في الخلفية
   e.respondWith(
-    fetch(e.request)
-      .then((res) => {
-        const copy = res.clone();
-        caches.open(CACHE_NAME).then((c) => c.put(e.request, copy)).catch(() => {});
+    caches.match(e.request).then((cached) => {
+      const networkPromise = fetch(e.request).then((res) => {
+        if (res && res.status === 200) {
+          const copy = res.clone();
+          caches.open(CACHE_NAME).then((c) => c.put(e.request, copy)).catch(() => {});
+        }
         return res;
-      })
-      .catch(() => caches.match(e.request).then((c) => c || caches.match('./index.html')))
+      }).catch(() => cached || caches.match('./index.html'));
+      // ارجع الكاش فوراً، أو الشبكة لو ما فيه كاش
+      return cached || networkPromise;
+    })
   );
 });

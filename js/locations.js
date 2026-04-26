@@ -124,6 +124,7 @@ const Locations = {
         toast('تمت الإضافة ✓', 'success');
       }
 
+      Realtime.markLocalChange();
       closeModal('location-modal');
       await Locations.load();
     } catch (err) {
@@ -234,6 +235,7 @@ const Locations = {
     if (!ok) return;
     const { error } = await supabaseClient.from('locations').delete().eq('id', loc.id);
     if (error) { toast('فشل الحذف', 'error'); return; }
+    Realtime.markLocalChange();
     toast('تم الحذف', 'success');
     closeModal('location-detail-modal');
     await Locations.load();

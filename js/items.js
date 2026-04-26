@@ -22,8 +22,12 @@ const Items = {
       hide('#item-image-remove');
     });
 
-    $('#add-item-here-btn').addEventListener('click', () => {
-      Items.openAdd(State.currentLocationId);
+    $('#add-item-here-btn').addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const locId = State.currentLocationId;
+      closeModal('location-detail-modal');
+      setTimeout(() => Items.openAdd(locId), 50);
     });
 
     $('#edit-item-btn').addEventListener('click', () => {
@@ -137,7 +141,9 @@ const Items = {
       closeModal('item-modal');
       await Items.load();
       Locations.render();
-      if (State.currentLocationId) Locations.renderItems();
+      if (State.currentLocationId) {
+        Locations.openDetail(State.currentLocationId);
+      }
     } catch (err) {
       console.error(err);
       toast('فشل الحفظ', 'error');

@@ -1,5 +1,5 @@
 // Service Worker بسيط لتطبيق أغراضي
-const CACHE_NAME = 'agradi-v1';
+const CACHE_NAME = 'agradi-v2';
 const ASSETS = [
   './',
   './index.html',

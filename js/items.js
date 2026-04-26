@@ -25,9 +25,7 @@ const Items = {
     $('#add-item-here-btn').addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
-      const locId = State.currentLocationId;
-      closeModal('location-detail-modal');
-      setTimeout(() => Items.openAdd(locId), 50);
+      Items.openAdd(State.currentLocationId);
     });
 
     $('#edit-item-btn').addEventListener('click', () => {
@@ -141,9 +139,7 @@ const Items = {
       closeModal('item-modal');
       await Items.load();
       Locations.render();
-      if (State.currentLocationId) {
-        Locations.openDetail(State.currentLocationId);
-      }
+      if (State.currentLocationId) Locations.renderItems();
     } catch (err) {
       console.error(err);
       toast('فشل الحفظ', 'error');

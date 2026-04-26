@@ -343,6 +343,8 @@ label {
   display: none; align-items: flex-end; justify-content: center;
   z-index: 100; animation: fadeIn .2s ease;
 }
+/* النوافذ الفرعية تظهر فوق نوافذ التفاصيل */
+#item-modal, #location-modal, #item-detail-modal, #confirm-modal { z-index: 120; }
 .modal.active { display: flex; }
 @media (min-width: 600px) { .modal { align-items: center; } }
 

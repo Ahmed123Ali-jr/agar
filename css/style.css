@@ -313,10 +313,6 @@ label {
 }
 .fab:active { transform: translateX(-50%) scale(.92); }
 
-@media (min-width: 600px) {
-  .fab { left: 50%; }
-}
-
 /* ===== Bottom Nav ===== */
 .bottom-nav {
   position: fixed; bottom: 0; left: 0; right: 0;
@@ -325,8 +321,21 @@ label {
   padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
   z-index: 30;
 }
+
+/* على الديسكتوب: ثبّت الـ FAB والـ Nav داخل عمود التطبيق (480px) بدل ما يطفّون لأطراف الشاشة */
 @media (min-width: 600px) {
-  .bottom-nav { left: 50%; transform: translateX(-50%); max-width: 480px; width: 100%; }
+  #app.screen.active { position: relative; }
+  .fab {
+    position: absolute;
+    left: 50%;
+  }
+  .bottom-nav {
+    position: absolute;
+    left: 0; right: 0;
+    transform: none;
+    max-width: 100%;
+    width: 100%;
+  }
 }
 .nav-btn {
   display: flex; flex-direction: column; align-items: center; gap: 2px;

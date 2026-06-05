@@ -443,24 +443,24 @@ label {
   font-size: 4rem; margin-bottom: 1rem; overflow: hidden;
 }
 
-/* زر أخرجته/رجعته */
+/* زر أخرجته/رجعته - يجي مع تعديل وحذف */
+.item-actions-row { flex-wrap: wrap; gap: 8px; }
 .btn-toggle-out {
-  width: 100%;
-  margin-top: 1rem;
-  padding: 14px;
-  border: 2px solid var(--border);
+  padding: 10px 16px;
+  border: 2px solid #ff9933;
   border-radius: var(--radius-sm);
-  background: var(--bg-card);
-  color: var(--ink);
-  font-weight: 600;
-  font-size: 1rem;
-  transition: all .15s;
-}
-.btn-toggle-out:active { transform: scale(.98); }
-.btn-toggle-out.is-out {
   background: #fff4e5;
-  border-color: #ff9933;
   color: #b85a00;
+  font-weight: 600;
+  font-size: .95rem;
+  transition: all .15s;
+  min-width: 110px;
+}
+.btn-toggle-out:active { transform: scale(.96); }
+.btn-toggle-out.is-out {
+  background: var(--success);
+  border-color: var(--success);
+  color: white;
 }
 
 /* علامة "خارج المكان" على البطاقة */

@@ -65,9 +65,12 @@ const Items = {
     const btn = $('#toggle-out-btn');
     const txt = $('#toggle-out-text');
     const since = $('#out-since-text');
+    const nameEl = $('#item-detail-name');
     if (item.is_out) {
       btn.classList.add('is-out');
-      txt.textContent = '✅ رجعته لمكانه';
+      txt.textContent = '✅ رجعته';
+      // علامة بجنب الاسم
+      nameEl.innerHTML = '<span class="item-out-badge">📤 خارج</span> ' + escapeHtml(item.name);
       if (item.out_since) {
         const d = new Date(item.out_since);
         since.textContent = '📤 خرج بتاريخ ' + d.toLocaleString('ar-SA', { dateStyle: 'short', timeStyle: 'short' });
@@ -75,7 +78,8 @@ const Items = {
       } else { hide(since); }
     } else {
       btn.classList.remove('is-out');
-      txt.textContent = '📤 أخرجته من مكانه';
+      txt.textContent = '📤 أخرجته';
+      nameEl.textContent = item.name;
       hide(since);
     }
   },

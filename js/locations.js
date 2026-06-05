@@ -212,12 +212,12 @@ const Locations = {
     hide(empty);
 
     list.innerHTML = items.map(it => `
-      <div class="item-card" data-id="${it.id}">
+      <div class="item-card ${it.is_out ? 'is-out' : ''}" data-id="${it.id}">
         <div class="item-thumb">
           ${it.image_url ? `<img src="${escapeHtml(it.image_url)}" loading="lazy" />` : '🎒'}
         </div>
         <div class="item-info">
-          <div class="item-name">${escapeHtml(it.name)}</div>
+          <div class="item-name">${it.is_out ? '<span class="item-out-badge">📤 خارج</span>' : ''}${escapeHtml(it.name)}</div>
           <div class="item-meta">الكمية: ${it.quantity || 1}${it.notes ? ' · ' + escapeHtml(it.notes.slice(0,40)) : ''}</div>
         </div>
       </div>

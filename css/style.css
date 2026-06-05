@@ -442,6 +442,40 @@ label {
   display: flex; align-items: center; justify-content: center;
   font-size: 4rem; margin-bottom: 1rem; overflow: hidden;
 }
+
+/* زر أخرجته/رجعته */
+.btn-toggle-out {
+  width: 100%;
+  margin-top: 1rem;
+  padding: 14px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  color: var(--ink);
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all .15s;
+}
+.btn-toggle-out:active { transform: scale(.98); }
+.btn-toggle-out.is-out {
+  background: #fff4e5;
+  border-color: #ff9933;
+  color: #b85a00;
+}
+
+/* علامة "خارج المكان" على البطاقة */
+.item-card { position: relative; }
+.item-out-badge {
+  display: inline-block;
+  background: #ff9933;
+  color: white;
+  font-size: .7rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-weight: 600;
+  margin-right: 6px;
+}
+.item-card.is-out { background: #fffaf3; border-color: #ffd9a8; }
 .item-detail-image img { width: 100%; height: 100%; object-fit: cover; }
 
 /* ===== Voice Overlay ===== */

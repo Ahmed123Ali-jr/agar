@@ -33,6 +33,51 @@ const Items = {
       if (it) Items.openEdit(it);
     });
     $('#delete-item-btn').addEventListener('click', () => Items.deleteCurrent());
+    $('#toggle-out-btn').addEventListener('click', () => Items.toggleOut());
+  },
+
+  async toggleOut() {
+    const it = State.items.find(i => i.id === Items.currentItemId);
+    if (!it) return;
+    const newOut = !it.is_out;
+    const btn = $('#toggle-out-btn');
+    btn.disabled = true;
+    const { error } = await supabaseClient
+      .from('items')
+      .update({
+        is_out: newOut,
+        out_since: newOut ? new Date().toISOString() : null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', it.id);
+    btn.disabled = false;
+    if (error) { toast('فشل التحديث', 'error'); return; }
+    Realtime.markLocalChange();
+    it.is_out = newOut;
+    it.out_since = newOut ? new Date().toISOString() : null;
+    toast(newOut ? '📤 الغرض خارج مكانه' : '✅ رجعته لمكانه', 'success');
+    Items.updateToggleUI(it);
+    Locations.render();
+    if (State.currentLocationId) Locations.renderItems();
+  },
+
+  updateToggleUI(item) {
+    const btn = $('#toggle-out-btn');
+    const txt = $('#toggle-out-text');
+    const since = $('#out-since-text');
+    if (item.is_out) {
+      btn.classList.add('is-out');
+      txt.textContent = '✅ رجعته لمكانه';
+      if (item.out_since) {
+        const d = new Date(item.out_since);
+        since.textContent = '📤 خرج بتاريخ ' + d.toLocaleString('ar-SA', { dateStyle: 'short', timeStyle: 'short' });
+        show(since);
+      } else { hide(since); }
+    } else {
+      btn.classList.remove('is-out');
+      txt.textContent = '📤 أخرجته من مكانه';
+      hide(since);
+    }
   },
 
   handleImage(file) {
@@ -181,6 +226,7 @@ const Items = {
     } else {
       hide('#item-detail-notes-wrap');
     }
+    Items.updateToggleUI(it);
     openModal('item-detail-modal');
   },
 

@@ -50,10 +50,16 @@ create table if not exists items (
   notes text,
   image_url text,
   quantity int default 1,
+  is_out boolean default false,
+  out_since timestamptz,
   created_by uuid references auth.users,
   created_at timestamp default now(),
   updated_at timestamp default now()
 );
+
+-- ترقية الجداول القديمة (آمنة لو الأعمدة موجودة)
+alter table items add column if not exists is_out boolean default false;
+alter table items add column if not exists out_since timestamptz;
 
 -- ============ الفهارس ============
 create index if not exists items_name_idx on items using gin(to_tsvector('simple', name));

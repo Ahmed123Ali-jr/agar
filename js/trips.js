@@ -267,7 +267,16 @@ const Trips = {
         .insert({ name, family_id: State.family.id, created_by: State.user.id })
         .select()
         .single();
-      if (error) { toast('فشل الإنشاء', 'error'); return; }
+      if (error) {
+        console.error('createTrip', error);
+        const m = (error.message || '').toLowerCase();
+        if (m.includes('does not exist') || m.includes('relation') || m.includes('schema')) {
+          toast('جدول trips غير موجود — شغّل SQL في Supabase', 'error');
+        } else {
+          toast('فشل: ' + (error.message || 'خطأ غير معروف'), 'error');
+        }
+        return;
+      }
       Trips.list.unshift(data);
     }
     closeModal('trip-name-modal');

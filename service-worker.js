@@ -1,5 +1,5 @@
 // Service Worker — Cache-first للسرعة، تحديث في الخلفية
-const CACHE_NAME = 'agradi-v9';
+const CACHE_NAME = 'agradi-v10';
 const ASSETS = [
   './',
   './index.html',

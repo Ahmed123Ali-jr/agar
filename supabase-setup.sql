@@ -61,6 +61,56 @@ create table if not exists items (
 alter table items add column if not exists is_out boolean default false;
 alter table items add column if not exists out_since timestamptz;
 
+-- ============================================
+-- جداول السفر (Trips & Trip Items)
+-- ============================================
+
+create table if not exists trips (
+  id uuid primary key default uuid_generate_v4(),
+  family_id uuid references families on delete cascade,
+  name text not null,
+  archived_at timestamptz,
+  created_by uuid references auth.users,
+  created_at timestamp default now(),
+  updated_at timestamp default now()
+);
+
+create table if not exists trip_items (
+  id uuid primary key default uuid_generate_v4(),
+  trip_id uuid references trips on delete cascade,
+  parent_id uuid references trip_items on delete cascade,
+  family_id uuid references families on delete cascade,
+  name text not null,
+  is_checked boolean default false,
+  position int default 0,
+  created_at timestamp default now()
+);
+
+create index if not exists trips_family_idx on trips(family_id);
+create index if not exists trip_items_trip_idx on trip_items(trip_id);
+create index if not exists trip_items_parent_idx on trip_items(parent_id);
+
+alter table trips enable row level security;
+alter table trip_items enable row level security;
+
+drop policy if exists "view family trips" on trips;
+create policy "view family trips" on trips for select using (is_family_member(family_id));
+drop policy if exists "insert family trips" on trips;
+create policy "insert family trips" on trips for insert with check (is_family_member(family_id));
+drop policy if exists "update family trips" on trips;
+create policy "update family trips" on trips for update using (is_family_member(family_id));
+drop policy if exists "delete family trips" on trips;
+create policy "delete family trips" on trips for delete using (is_family_member(family_id));
+
+drop policy if exists "view family trip_items" on trip_items;
+create policy "view family trip_items" on trip_items for select using (is_family_member(family_id));
+drop policy if exists "insert family trip_items" on trip_items;
+create policy "insert family trip_items" on trip_items for insert with check (is_family_member(family_id));
+drop policy if exists "update family trip_items" on trip_items;
+create policy "update family trip_items" on trip_items for update using (is_family_member(family_id));
+drop policy if exists "delete family trip_items" on trip_items;
+create policy "delete family trip_items" on trip_items for delete using (is_family_member(family_id));
+
 -- ============ الفهارس ============
 create index if not exists items_name_idx on items using gin(to_tsvector('simple', name));
 create index if not exists items_family_idx on items(family_id);

@@ -345,6 +345,94 @@ label {
 .nav-btn.active { color: var(--accent); }
 .nav-icon { font-size: 1.4rem; }
 
+/* ===== Trips ===== */
+.trips-list { display: flex; flex-direction: column; gap: 10px; }
+.trip-card {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 14px;
+  cursor: pointer; transition: border-color .2s, transform .1s;
+}
+.trip-card:active { transform: scale(.99); }
+.trip-card:hover { border-color: var(--accent); }
+.trip-card.archived { opacity: .6; }
+.trip-card-icon { font-size: 2rem; flex-shrink: 0; }
+.trip-card-body { flex: 1; min-width: 0; }
+.trip-card-name { font-weight: 600; font-size: 1.05rem; }
+.trip-card-meta { font-size: .8rem; margin-top: 2px; }
+.trip-card-menu { font-size: 1.3rem; line-height: 1; padding: 6px 10px; }
+
+.trip-detail-header {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 8px; margin-bottom: .75rem;
+  position: sticky; top: 0; background: var(--bg); z-index: 5;
+  padding: .5rem 0;
+}
+.trip-detail-header h2 { flex: 1; font-size: 1.25rem; text-align: center; margin: 0; }
+
+.trip-progress {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  margin-bottom: .75rem;
+  display: flex; align-items: center; gap: 12px;
+}
+.progress-bar {
+  flex: 1; height: 8px;
+  background: var(--bg); border-radius: 999px; overflow: hidden;
+}
+.progress-fill {
+  height: 100%; background: var(--success);
+  border-radius: 999px; transition: width .25s;
+}
+
+.trip-tree { margin-top: 8px; }
+.trip-node { margin: 4px 0; }
+.trip-children {
+  padding-right: 1.25rem;
+  margin: 2px 0;
+  border-right: 2px dashed var(--border);
+}
+
+.trip-node-row {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  transition: all .15s;
+}
+.trip-node-row.checked {
+  background: #f0f9f3;
+  border-color: #c8e0d2;
+}
+.trip-node-row.checked .node-name {
+  text-decoration: line-through;
+  color: var(--ink-soft);
+}
+
+.node-chevron, .node-check, .node-add, .node-menu {
+  background: transparent;
+  font-size: 1rem;
+  padding: 4px 6px;
+  border-radius: 6px;
+  transition: background .2s;
+  flex-shrink: 0;
+}
+.node-chevron:hover, .node-check:hover, .node-add:hover, .node-menu:hover {
+  background: var(--bg);
+}
+.node-chevron.invisible { visibility: hidden; }
+.node-check { font-size: 1.1rem; }
+.node-name {
+  flex: 1; cursor: pointer; font-weight: 500;
+  padding: 4px 6px; min-width: 0;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.node-add { color: var(--accent); font-weight: 700; font-size: 1.1rem; }
+.node-menu { color: var(--ink-soft); }
+
 /* ===== Modals ===== */
 .modal {
   position: fixed; inset: 0;

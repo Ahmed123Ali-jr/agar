@@ -21,6 +21,7 @@ const App = {
     Locations.init();
     Items.init();
     Search.init();
+    Trips.init();
     App.bindNav();
     App.bindFab();
     App.bindModals();
@@ -149,14 +150,20 @@ const App = {
   },
 
   goTo(page) {
+    // التبويبات الرئيسية فقط تظهر في الشريط السفلي
+    const mainPages = ['home', 'search', 'trips', 'settings'];
     $$('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.page === page));
-    $$('.page').forEach(p => p.classList.remove('active'));
-    $('#page-' + page).classList.add('active');
 
-    // إخفاء/إظهار الهيدر للبحث السريع
-    if (page === 'search') {
-      $('#search-input').focus();
-    }
+    $$('.page').forEach(p => p.classList.remove('active'));
+    const target = $('#page-' + page);
+    if (target) target.classList.add('active');
+
+    // إظهار/إخفاء FAB والشريط السفلي حسب الصفحة
+    const showFab = page === 'home';
+    $('#fab').style.display = showFab ? 'flex' : 'none';
+
+    if (page === 'search') $('#search-input').focus();
+    if (page === 'trips') Trips.loadTrips();
   },
 
   // ===== FAB =====
@@ -193,6 +200,10 @@ const App = {
       if (!ok) return;
       await Auth.logout();
     });
+
+    // فتح صفحة العائلة من الإعدادات
+    $('#open-family-btn').addEventListener('click', () => App.goTo('family'));
+    $('#back-from-family').addEventListener('click', () => App.goTo('settings'));
 
     $('#save-display-name').addEventListener('click', async () => {
       const newName = $('#settings-display-name').value.trim();

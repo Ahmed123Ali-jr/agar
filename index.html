@@ -129,9 +129,43 @@
         <div id="search-results" class="search-results"></div>
       </section>
 
-      <!-- صفحة العائلة -->
+      <!-- صفحة السفر -->
+      <section id="page-trips" class="page">
+        <div class="page-header">
+          <h2>قوائم السفر</h2>
+          <button class="btn-small" id="new-trip-btn">+ جديدة</button>
+        </div>
+        <div id="trips-list" class="trips-list"></div>
+        <div id="empty-trips" class="empty-state hidden">
+          <div class="empty-emoji">✈️</div>
+          <h3>لا توجد سفرات بعد</h3>
+          <p>اضغط "+ جديدة" لإنشاء أول قائمة سفر</p>
+        </div>
+      </section>
+
+      <!-- صفحة تفاصيل السفرة (شجرة) -->
+      <section id="page-trip-detail" class="page">
+        <div class="trip-detail-header">
+          <button class="btn-icon" id="back-from-trip">← رجوع</button>
+          <h2 id="trip-detail-name"></h2>
+          <button class="btn-icon" id="trip-menu-btn">⋮</button>
+        </div>
+        <div class="trip-progress">
+          <div class="progress-bar"><div id="trip-progress-fill" class="progress-fill"></div></div>
+          <span id="trip-progress-text"></span>
+        </div>
+        <button class="btn-secondary" id="add-trip-root-item">+ إضافة عنصر</button>
+        <div id="trip-tree" class="trip-tree"></div>
+        <div id="empty-trip-items" class="empty-state hidden">
+          <div class="empty-emoji">📋</div>
+          <p>القائمة فارغة — أضف أول عنصر</p>
+        </div>
+      </section>
+
+      <!-- صفحة العائلة (تُفتح من الإعدادات) -->
       <section id="page-family" class="page">
         <div class="page-header">
+          <button class="btn-icon" id="back-from-family">← رجوع</button>
           <h2>العائلة</h2>
         </div>
         <div class="family-info">
@@ -170,6 +204,10 @@
             <label>الإيميل</label>
             <p id="settings-email"></p>
           </div>
+          <button class="big-option" id="open-family-btn">
+            <span class="big-emoji">👨‍👩‍👧</span>
+            <span class="big-label">إدارة العائلة</span>
+          </button>
           <button class="btn-danger" id="logout-btn">تسجيل خروج</button>
           <p class="version">أغراضي · الإصدار 1.0</p>
         </div>
@@ -190,9 +228,9 @@
         <span class="nav-icon">🔍</span>
         <span class="nav-label">البحث</span>
       </button>
-      <button class="nav-btn" data-page="family">
-        <span class="nav-icon">👨‍👩‍👧</span>
-        <span class="nav-label">العائلة</span>
+      <button class="nav-btn" data-page="trips">
+        <span class="nav-icon">✈️</span>
+        <span class="nav-label">سفر</span>
       </button>
       <button class="nav-btn" data-page="settings">
         <span class="nav-icon">⚙️</span>
@@ -363,6 +401,83 @@
     </div>
   </div>
 
+  <!-- نافذة اسم السفرة (إنشاء/تعديل) -->
+  <div id="trip-name-modal" class="modal">
+    <div class="modal-content small">
+      <div class="modal-header">
+        <h3 id="trip-name-modal-title">سفرة جديدة</h3>
+        <button class="btn-close" data-close-modal>✕</button>
+      </div>
+      <form id="trip-name-form">
+        <input type="hidden" id="trip-name-id" />
+        <label>اسم السفرة</label>
+        <input type="text" id="trip-name-input" placeholder="مثال: سفرة دبي" required maxlength="60" />
+        <div class="modal-actions">
+          <button type="button" class="btn-text" data-close-modal>إلغاء</button>
+          <button type="submit" class="btn-primary">حفظ</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- نافذة عنصر السفر (إضافة/تعديل) -->
+  <div id="trip-item-modal" class="modal">
+    <div class="modal-content small">
+      <div class="modal-header">
+        <h3 id="trip-item-modal-title">عنصر جديد</h3>
+        <button class="btn-close" data-close-modal>✕</button>
+      </div>
+      <form id="trip-item-form">
+        <input type="hidden" id="trip-item-id" />
+        <input type="hidden" id="trip-item-parent-id" />
+        <label>الاسم</label>
+        <input type="text" id="trip-item-name" placeholder="مثال: تيشيرتاتي" required maxlength="80" />
+        <p id="trip-item-parent-hint" class="muted" style="font-size:.85rem"></p>
+        <div class="modal-actions">
+          <button type="button" class="btn-text" data-close-modal>إلغاء</button>
+          <button type="submit" class="btn-primary">حفظ</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- قائمة السفرة (تعديل، نسخ، أرشفة، حذف) -->
+  <div id="trip-menu-modal" class="modal">
+    <div class="modal-content small">
+      <h3>خيارات السفرة</h3>
+      <button class="big-option" id="trip-rename-btn">
+        <span class="big-emoji">✏️</span><span class="big-label">تعديل الاسم</span>
+      </button>
+      <button class="big-option" id="trip-duplicate-btn">
+        <span class="big-emoji">📋</span><span class="big-label">نسخ (بدون علامات)</span>
+      </button>
+      <button class="big-option" id="trip-archive-btn">
+        <span class="big-emoji">🗄️</span><span class="big-label" id="trip-archive-label">أرشفة</span>
+      </button>
+      <button class="big-option" id="trip-delete-btn">
+        <span class="big-emoji">🗑️</span><span class="big-label" style="color:var(--danger)">حذف</span>
+      </button>
+      <button class="btn-text" data-close-modal>إلغاء</button>
+    </div>
+  </div>
+
+  <!-- قائمة عنصر السفر (تعديل، حذف) -->
+  <div id="trip-item-menu-modal" class="modal">
+    <div class="modal-content small">
+      <h3>خيارات العنصر</h3>
+      <button class="big-option" id="trip-item-add-child-btn">
+        <span class="big-emoji">➕</span><span class="big-label">إضافة عنصر داخله</span>
+      </button>
+      <button class="big-option" id="trip-item-rename-btn">
+        <span class="big-emoji">✏️</span><span class="big-label">تعديل الاسم</span>
+      </button>
+      <button class="big-option" id="trip-item-delete-btn">
+        <span class="big-emoji">🗑️</span><span class="big-label" style="color:var(--danger)">حذف</span>
+      </button>
+      <button class="btn-text" data-close-modal>إلغاء</button>
+    </div>
+  </div>
+
   <!-- مؤشر التسجيل الصوتي -->
   <div id="voice-overlay" class="voice-overlay">
     <div class="voice-pulse"></div>
@@ -382,6 +497,7 @@
   <script src="js/locations.js"></script>
   <script src="js/items.js"></script>
   <script src="js/search.js"></script>
+  <script src="js/trips.js"></script>
   <script src="js/realtime.js"></script>
   <script src="js/app.js"></script>
 

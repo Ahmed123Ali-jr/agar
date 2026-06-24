@@ -60,6 +60,31 @@ const Realtime = {
           Family.renderFamilyPage();
         }, 300);
       })
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'trips',
+        filter: `family_id=eq.${State.family.id}`,
+      }, () => {
+        if (Realtime.isFresh()) return;
+        clearTimeout(Realtime.tripsTimer);
+        Realtime.tripsTimer = setTimeout(() => Trips.loadTrips(), 300);
+      })
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'trip_items',
+        filter: `family_id=eq.${State.family.id}`,
+      }, () => {
+        if (Realtime.isFresh()) return;
+        clearTimeout(Realtime.tripItemsTimer);
+        Realtime.tripItemsTimer = setTimeout(async () => {
+          if (Trips.currentTripId) {
+            await Trips.loadItems(Trips.currentTripId);
+            Trips.renderTree();
+          }
+        }, 300);
+      })
       .subscribe();
   },
 

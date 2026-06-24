@@ -124,10 +124,13 @@ const Auth = {
 
   translateError(msg) {
     const m = (msg || '').toLowerCase();
+    if (m.includes('load failed') || m.includes('failed to fetch') || m.includes('networkerror')) {
+      return 'لا يصل الاتصال بـ Supabase — راجع: نشاط المشروع، الإنترنت، أو امسح الكاش';
+    }
     if (m.includes('invalid login') || m.includes('invalid credentials')) return 'الإيميل أو كلمة السر غير صحيحة';
     if (m.includes('already registered') || m.includes('already exists') || m.includes('user already')) return 'هذا الحساب مسجل مسبقاً';
     if (m.includes('password') && m.includes('6')) return 'كلمة السر يجب أن تكون 6 أحرف على الأقل';
-    if (m.includes('email address') && m.includes('invalid')) return 'صيغة الإيميل غير مقبولة من Supabase — راجع Console';
+    if (m.includes('email address') && m.includes('invalid')) return 'صيغة الإيميل غير مقبولة من Supabase';
     if (m.includes('signup') && m.includes('disabled')) return 'التسجيل معطّل في Supabase — فعّله من Authentication';
     if (m.includes('rate limit')) return 'حاول بعد دقيقة (rate limit)';
     if (m.includes('email')) return 'مشكلة في الإيميل: ' + (msg || '');

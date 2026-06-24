@@ -33,7 +33,8 @@ const Items = {
       if (it) Items.openEdit(it);
     });
     $('#delete-item-btn').addEventListener('click', () => Items.deleteCurrent());
-    $('#toggle-out-btn').addEventListener('click', () => Items.toggleOut());
+    const toggleBtn = $('#toggle-out-btn');
+    if (toggleBtn) toggleBtn.addEventListener('click', () => Items.toggleOut());
   },
 
   async toggleOut() {

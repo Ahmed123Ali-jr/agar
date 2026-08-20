@@ -1,0 +1,17 @@
+name: Keep Supabase Alive
+
+on:
+  schedule:
+    - cron: '0 6 */3 * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase REST API
+        run: |
+          curl -sS -o /dev/null -w "HTTP %{http_code}\n" \
+            -H "apikey: sb_publishable_0L2hZ8vjkzqhnAAuejN32w_mhgyD5I0" \
+            -H "Authorization: Bearer sb_publishable_0L2hZ8vjkzqhnAAuejN32w_mhgyD5I0" \
+            "https://vzkrxpeiudmlorbezays.supabase.co/rest/v1/families?select=id&limit=1"
